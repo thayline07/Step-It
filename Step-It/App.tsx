@@ -1,20 +1,38 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import {} from "react-native";
+import {
+  useFonts,
+  Inter_600SemiBold,
+  Inter_800ExtraBold,
+  Inter_400Regular,
+} from "@expo-google-fonts/inter";
+
+import { RoutesStack } from "./src/routes";
+
+import { ThemeProvider, useThemeContext } from "./src/theme/ThemeProvider";
+import { Inicial } from "./src/screens/Inicial";
+import { AppRoutesStack } from "./src/routes/app.routes";
 
 export default function App() {
+  let [fontsLoaded] = useFonts({
+    Inter_600SemiBold,
+    Inter_800ExtraBold,
+    Inter_400Regular,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <ThemeProvider>
+      <MainApp />
+    </ThemeProvider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+function MainApp() {
+  const { themeName, toggleTheme } = useThemeContext();
+
+  return <RoutesStack />;
+}

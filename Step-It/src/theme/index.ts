@@ -1,7 +1,7 @@
 export const lightTheme = {
   colors: {
     background_principal: "#fff",
-    background_gradient_linear: "#fff",
+    background_gradient_linear: ["rgba(21,94,157,0.2)", "rgba(98,170,234,0.2)"],
     background_gradient_diamond: "#fff",
     texto: "#000",
     raio: "#0B1F3A",
@@ -20,7 +20,7 @@ export const lightTheme = {
       borda:
         "linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 1))",
       sombra: "rgba(0, 0, 0, 0.05)",
-      icone: "#FFF",
+      icone: "#000",
     },
     navegacao: {
       background: "#020202",
@@ -38,14 +38,48 @@ export const lightTheme = {
       card: "linear-gradient(135deg, rgba(60, 158, 104, 1), rgba(163, 220, 188, 0.72))",
       link: "#10A3FF",
     },
-    relatorios: {},
+    relatorios: {
+      card: "transparent",
+      card_grafico:
+        "linear-gradient(135deg, rgba(46, 167, 255, 0.5), rgba(255, 255, 255, 0.2))",
+      linha_grafico: "#17B9FF",
+      borda: "#fff",
+      cor_grafico: "linear-gradient(to bottom, #17B9FF, transparent)",
+      borda_grafico: "#17B9FF",
+      icones: "#000",
+      background_icone_relatorio: "#0D2B48",
+      background_icone_voltar: "rgba(0, 0, 0, 0.5)",
+      background_icone_data: "rgba(0, 0, 0, 0.5)",
+      borda_icone_relatorio:
+        "linear-gradient(to top, #fff, rgba(255, 255, 255, 0.5))",
+      borda_icone_voltar:
+        "linear-gradient(to top, #fff, rgba(255, 255, 255, 0.5))",
+      borda_icone_data:
+        "linear-gradient(to top, #fff, rgba(255, 255, 255, 0.5))",
+      texto: "rgba(0, 0, 0, 0.6)",
+    },
+    login: {
+      title: "#000",
+      sombra_title: "#1F86E0",
+      texto: "#000",
+      texto_input: "#737373",
+      icone: "#737373",
+      input: "#fff",
+      border_input: "#737373",
+      botao_background: "linear-gradient(to top, #155E9D, #318154)",
+    },
+  },
+  fonts: {
+    bold: "Inter_800ExtraBold",
+    semiBold: "Inter_600SemiBold",
+    regular: "Inter_400Regular",
   },
 };
 
 export const darkTheme = {
   colors: {
     background_principal: "#020202",
-    background_gradient_linear: "linear-gradient(135deg, #155E9D, #020202)",
+    background_gradient_linear: ["rgba(98,170,234,0.1)", "rgba(21,94,157,0)"],
     background_gradient_diamond:
       "radial-gradient(circle, #62AAEA, #3871A4, #0D385E)",
     texto: "#fff",
@@ -63,7 +97,7 @@ export const darkTheme = {
       background: "transparent",
       borda: "linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1))",
       sombra: "rgba(0, 0, 0, 0.05)",
-      icone: "#000",
+      icone: "#fff",
     },
     borda_card: "#fff",
     navegacao: {
@@ -82,5 +116,38 @@ export const darkTheme = {
       card: "linear-gradient(135deg, rgba(60, 158, 104, 0.1), rgba(163, 220, 188, 0.072))",
       link: "#10A3FF",
     },
+    relatorios: {
+      card: "linear-gradient(to top, #17B9FF, transparent)",
+      card_grafico: "linear-gradient(135deg, #17B9FF, transparent)",
+      linha_grafico: "#17B9FF",
+      borda: "#fff",
+      cor_grafico: "linear-gradient(to bottom, #17B9FF, transparent)",
+      borda_grafico:
+        "linear-gradient(to bottom, #17B9FF, rgba(23, 185, 255, 0.2))",
+      icones: "#fff",
+      background_icone_relatorio: "rgba(98, 170, 234, 0.23)",
+      background_icone_voltar: "#fff",
+      background_icone_data: "#62AAEA",
+      borda_icone_relatorio: "transparent",
+      borda_icone_voltar: "#F6F6F6",
+      borda_icone_data: "transparent",
+      texto: "rgba(255, 255, 255, 0.6)",
+    },
+    login: {
+      title: "#fff",
+      sombra_title: "#1F86E0",
+      texto: "#fff",
+      texto_input: "#C9c9c9",
+      icone: "#c9c9c9",
+      input:
+        "linear-gradient(to bottom, rgba(60, 158, 104, 0.5), rgba(31, 134, 224, 0.72))",
+      border_input: "transparent",
+      botao_background: "linear-gradient(to top, #155E9D, #318154)",
+    },
+  },
+  fonts: {
+    bold: "Inter_800ExtraBold",
+    semiBold: "Inter_600SemiBold",
+    regular: "Inter_400Regular",
   },
 };
