@@ -8,5 +8,4 @@ export const Container = styled.View`
 
 export const Gradient = styled(LinearGradient)`
   flex: 1;
-  justify-content: center;
 `;

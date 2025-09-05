@@ -1,6 +1,7 @@
 import styled from "styled-components/native";
 
-export const Image = styled.Image`
-  align-self: center;
-  justify-self: center;
+export const View = styled.View`
+  flex: 1;
+  display: flex;
+  justify-content: center;
 `;

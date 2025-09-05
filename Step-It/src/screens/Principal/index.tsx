@@ -1,5 +1,13 @@
 import { Text } from "react-native";
+import { View } from "react-native";
+
+import { Cabecalho } from "./../../components/Cabecalho";
+import { Fundo } from "../../components/fundo";
 
 export function Principal() {
-  return <Text>Texto</Text>;
+  return (
+    <Fundo>
+      <Cabecalho tipo="QUATERNARIO" />
+    </Fundo>
+  );
 }

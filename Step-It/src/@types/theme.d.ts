@@ -56,13 +56,18 @@ export interface Theme {
     };
     login: {
       title: string;
-      sombra_title: string;
+      senha: string;
       texto: string;
       texto_input: string;
       icone: string;
-      input: string;
+      input: string[];
       border_input: string;
-      botao_background: string;
+      botao_background: string[];
     };
+  };
+  fonts: {
+    bold: string;
+    semiBold: string;
+    regular: string;
   };
 }

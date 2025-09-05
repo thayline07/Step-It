@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import {} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useFonts,
   Inter_600SemiBold,
@@ -8,10 +8,9 @@ import {
 } from "@expo-google-fonts/inter";
 
 import { RoutesStack } from "./src/routes";
-
 import { ThemeProvider, useThemeContext } from "./src/theme/ThemeProvider";
-import { Inicial } from "./src/screens/Inicial";
 import { AppRoutesStack } from "./src/routes/app.routes";
+// import { Inicial } from "./src/screens/Inicial";
 
 export default function App() {
   let [fontsLoaded] = useFonts({
@@ -26,7 +25,9 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <MainApp />
+      <SafeAreaView edges={["top", "left", "right"]} style={{ flex: 1 }}>
+        <MainApp />
+      </SafeAreaView>
     </ThemeProvider>
   );
 }

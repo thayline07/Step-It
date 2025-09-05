@@ -1,7 +1,7 @@
 export const lightTheme = {
   colors: {
     background_principal: "#fff",
-    background_gradient_linear: ["rgba(21,94,157,0.2)", "rgba(98,170,234,0.2)"],
+    background_gradient_linear: ["#fff", "#fff"],
     background_gradient_diamond: "#fff",
     texto: "#000",
     raio: "#0B1F3A",
@@ -17,13 +17,12 @@ export const lightTheme = {
     borda_card: "#fff",
     botao_theme: {
       background: "transparent",
-      borda:
-        "linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 1))",
+      borda: "rgba(0, 0, 0, 0.5)",
       sombra: "rgba(0, 0, 0, 0.05)",
       icone: "#000",
     },
     navegacao: {
-      background: "#020202",
+      background: "#fff",
       sombra: "#000",
       borda:
         "linear-gradient(135deg, rgba(20, 29, 38, 0.69), rgba(20, 29, 38, 0))",
@@ -60,13 +59,13 @@ export const lightTheme = {
     },
     login: {
       title: "#000",
-      sombra_title: "#1F86E0",
+      senha: "#1F86E0",
       texto: "#000",
       texto_input: "#737373",
       icone: "#737373",
-      input: "#fff",
+      input: ["#fff", "#fff"],
       border_input: "#737373",
-      botao_background: "linear-gradient(to top, #155E9D, #318154)",
+      botao_background: ["#rgba(21, 94, 157, 0.7)", "#rgba(49, 129, 84, 0.7)"],
     },
   },
   fonts: {
@@ -79,7 +78,7 @@ export const lightTheme = {
 export const darkTheme = {
   colors: {
     background_principal: "#020202",
-    background_gradient_linear: ["rgba(98,170,234,0.1)", "rgba(21,94,157,0)"],
+    background_gradient_linear: ["rgba(21,94,157,0)", "rgba(98,170,234,0.1)"],
     background_gradient_diamond:
       "radial-gradient(circle, #62AAEA, #3871A4, #0D385E)",
     texto: "#fff",
@@ -95,13 +94,14 @@ export const darkTheme = {
     card: "linear-gradient(135deg, rgba(60, 158, 104, 0.1), rgba(163, 220, 188, 0.1))",
     botao_theme: {
       background: "transparent",
-      borda: "linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1))",
-      sombra: "rgba(0, 0, 0, 0.05)",
+
+      borda: "rgba(255, 255, 255, 0.5)",
+      sombra: "rgba(255, 255, 255, 0.5)",
       icone: "#fff",
     },
     borda_card: "#fff",
     navegacao: {
-      background: "#fff",
+      background: "#000",
       sombra: "#000",
       borda:
         "linear-gradient(135deg, rgba(31, 134, 224, 0.69), rgba(31, 134, 224, 0))",
@@ -135,14 +135,13 @@ export const darkTheme = {
     },
     login: {
       title: "#fff",
-      sombra_title: "#1F86E0",
-      texto: "#fff",
-      texto_input: "#C9c9c9",
-      icone: "#c9c9c9",
-      input:
-        "linear-gradient(to bottom, rgba(60, 158, 104, 0.5), rgba(31, 134, 224, 0.72))",
+      senha: "rgba(255, 255, 255, 0.6)",
+      texto: "rgba(255, 255, 255, 0.6)",
+      texto_input: "rgba(201, 201, 201, 0.6)",
+      icone: "rgba(201, 201, 201, 0.6)",
+      input: ["rgba(60, 158, 104, 0.1)", "rgba(31, 134, 224, 0.2)"],
       border_input: "transparent",
-      botao_background: "linear-gradient(to top, #155E9D, #318154)",
+      botao_background: ["#rgba(21, 94, 157, 0.7)", "#rgba(49, 129, 84, 0.7)"],
     },
   },
   fonts: {
