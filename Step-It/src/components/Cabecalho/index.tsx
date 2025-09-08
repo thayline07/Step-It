@@ -9,12 +9,19 @@ import {
   CabecalhoSubtitulo,
 } from "./styles";
 import { SunIcon, MoonIcon, ArrowLeftIcon } from "phosphor-react-native";
+import { TouchableOpacity } from "react-native";
 // import { ThemeProvider } from "./../../theme/ThemeProvider";
 
 type tipoCabecalho = "PRINCIPAL" | "SECUNDARIO" | "TERCIARIO" | "QUATERNARIO";
 type iconType = "CLARO" | "ESCURO";
 
-export function Cabecalho({ tipo }: { tipo: tipoCabecalho }) {
+export function Cabecalho({
+  tipo,
+  funcao,
+}: {
+  tipo: tipoCabecalho;
+  funcao?: () => void;
+}) {
   const theme = useTheme();
   const currentTheme = useThemeContext();
 
@@ -62,12 +69,14 @@ export function Cabecalho({ tipo }: { tipo: tipoCabecalho }) {
     case "QUATERNARIO":
       return (
         <Container>
-          <ArrowLeftIcon
-            style={{ marginTop: 16 }}
-            size={24}
-            color={theme.colors.login.icone}
-          />
-          <Button onPress={toggleTheme}>{renderIcon()}</Button>
+          <TouchableOpacity onPress={funcao}>
+            <ArrowLeftIcon
+              style={{ marginTop: 16 }}
+              size={24}
+              color={theme.colors.login.icone}
+            />
+          </TouchableOpacity>
+          {/* <Button onPress={toggleTheme}>{renderIcon()}</Button> */}
         </Container>
       );
   }

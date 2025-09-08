@@ -11,60 +11,46 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 
 import { Container, Form } from "./styles";
+import styled from "styled-components";
 
 type RootStackParamList = {
   App: { screen?: string };
   CriarConta: undefined;
   Login: undefined;
+  TrocarSenhaCodigo: undefined;
 };
 
-export function CriarConta() {
+export function TrocarSenha() {
   const theme = useTheme();
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   function voltar() {
-    return navigation.goBack();
+    return navigation.goBack("TrocarSenhaCodigo");
   }
-
   return (
     <Fundo>
       <Cabecalho funcao={voltar} tipo="QUATERNARIO" />
       <Container>
-        <LoginTitle text="Crie sua conta" />
+        <LoginTitle text="Redefinir Senha" />
         <Form>
           <InputForm
-            icon="user"
-            title="Usuário"
-            placeholder="Insira seu usuário"
-          />
-          <InputForm
-            icon="email"
-            title="E-mail"
-            placeholder="Insira seu e-mail"
-          />
-          <InputForm
-            icon="telefone"
-            title="Telefone"
-            placeholder="(00) 00000-0000"
+            icon="senha"
+            title="Nova senha"
+            placeholder="Insira sua senha nova"
           />
           <InputForm
             icon="senha"
-            title="Senha"
-            placeholder="Insira sua senha"
-          />
-          <InputForm
-            icon="senha"
-            title="Confirmar Senha"
-            placeholder="Insira novamente sua senha"
+            title="Confirmação de senha"
+            placeholder="Insira novamente a senha nova"
           />
 
           <BotaoLogar
-            style={{ marginTop: 70 }}
-            text="Criar Conta"
+            style={{ marginTop: 70, marginBottom: 80 }}
+            text="Redefinir Senha"
             onPress={() => navigation.navigate("Login")}
           />
         </Form>
-        {/* <Logo /> */}
+        <Logo />
       </Container>
     </Fundo>
   );

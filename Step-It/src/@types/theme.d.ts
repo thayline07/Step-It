@@ -11,12 +11,16 @@ export interface Theme {
     numero_legenda: string;
     titulo: string;
     borda_foto: string;
-    circulo_degrade: string;
+    circulo_degrade: string[];
     circulo_borda: string;
+    sombra: string;
+    color_circulo: string;
     titulo_card: string;
+    texto_card: string;
     texto_principal: string;
-    card: string;
+    card: string[];
     borda_card: string;
+    cor_bolinha: string;
     botao_theme: {
       background: string;
       borda: string;

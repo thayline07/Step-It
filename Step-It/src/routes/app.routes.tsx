@@ -5,6 +5,8 @@ import { ListaPisosRelatorio } from "./../screens/ListaPisosRelatorio/index";
 import { Perfil } from "./../screens/Perfil/index";
 import { Principal } from "./../screens/Principal/index";
 import { Relatorio } from "./../screens/Relatorio/index";
+import { TrocarSenhaCodigo } from "./../screens/TrocarSenhaCodigo/index";
+import { TrocarSenha } from "./../screens/TrocarSenha/index";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -92,7 +94,7 @@ function AppTabNavigator() {
                       alignItems: "center",
                       justifyContent: "center",
                       shadowColor: focused
-                        ? theme.colors.navegacao.sombra_icone_clicado
+                        ? theme.colors.navegacao.sombra_fundo_icone_clicado
                         : "transparent",
                       shadowOffset: { width: 0, height: 0 },
                       shadowOpacity: focused ? 0.8 : 0,
@@ -153,6 +155,8 @@ export function AppRoutesStack() {
       <Stack.Screen name="Inicial" component={Inicial} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="CriarConta" component={CriarConta} />
+      <Stack.Screen name="TrocarSenhaCodigo" component={TrocarSenhaCodigo} />
+      <Stack.Screen name="TrocarSenha" component={TrocarSenha} />
       <Stack.Screen name="App" component={AppTabNavigator} />
       <Stack.Screen name="Relatorio" component={Relatorio} />
     </Stack.Navigator>

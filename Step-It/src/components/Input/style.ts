@@ -3,7 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { TextInputProps } from "react-native";
 
 export const Container = styled.View`
-  margin: 20px 0 4px 0;
+  margin: 10px 0 4px 0;
 `;
 
 export const Title = styled.Text`

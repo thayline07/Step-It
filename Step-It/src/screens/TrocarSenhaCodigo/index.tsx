@@ -10,61 +10,42 @@ import { useTheme } from "styled-components/native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 
-import { Container, Form } from "./styles";
+import { Container, Form, Texto } from "./styles";
+import styled from "styled-components";
 
 type RootStackParamList = {
   App: { screen?: string };
   CriarConta: undefined;
+  TrocarSenha: undefined;
   Login: undefined;
 };
 
-export function CriarConta() {
+export function TrocarSenhaCodigo() {
   const theme = useTheme();
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   function voltar() {
-    return navigation.goBack();
+    return navigation.goBack("Login");
   }
 
   return (
     <Fundo>
       <Cabecalho funcao={voltar} tipo="QUATERNARIO" />
       <Container>
-        <LoginTitle text="Crie sua conta" />
+        <LoginTitle text="Confirmação de Código" />
+        <Texto>
+          Digite o código que enviamos ao seu email para confirmar sua
+          solicitação.
+        </Texto>
         <Form>
-          <InputForm
-            icon="user"
-            title="Usuário"
-            placeholder="Insira seu usuário"
-          />
-          <InputForm
-            icon="email"
-            title="E-mail"
-            placeholder="Insira seu e-mail"
-          />
-          <InputForm
-            icon="telefone"
-            title="Telefone"
-            placeholder="(00) 00000-0000"
-          />
-          <InputForm
-            icon="senha"
-            title="Senha"
-            placeholder="Insira sua senha"
-          />
-          <InputForm
-            icon="senha"
-            title="Confirmar Senha"
-            placeholder="Insira novamente sua senha"
-          />
-
+          <InputForm icon="key" placeholder="Insira o código" />
           <BotaoLogar
-            style={{ marginTop: 70 }}
-            text="Criar Conta"
-            onPress={() => navigation.navigate("Login")}
+            style={{ marginTop: 100, marginBottom: 55 }}
+            text="Confirmar"
+            onPress={() => navigation.navigate("TrocarSenha")}
           />
         </Form>
-        {/* <Logo /> */}
+        <Logo />
       </Container>
     </Fundo>
   );

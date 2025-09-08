@@ -8,11 +8,5 @@ export const Container = styled.View`
 
 export const Form = styled.View`
   display: flex;
-  margin-top: 15px;
-  /* margin-bottom: 30px; */
-`;
-
-export const TrocarSenha = styled.TouchableOpacity`
-  color: ${({ theme }) => theme.colors.login.senha};
-  margin-bottom: 60px;
+  margin-top: 25px;
 `;

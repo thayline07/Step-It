@@ -11,10 +11,12 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 
 import { Container, Form, TrocarSenha } from "./styles";
+import styled from "styled-components";
 
 type RootStackParamList = {
   App: { screen?: string };
   CriarConta: undefined;
+  TrocarSenhaCodigo: undefined;
 };
 
 export function Login() {
@@ -37,7 +39,7 @@ export function Login() {
             title="Senha"
             placeholder="Digite sua senha"
           />
-          <TrocarSenha onPress={() => navigation.navigate("CriarConta")}>
+          <TrocarSenha onPress={() => navigation.navigate("TrocarSenhaCodigo")}>
             <Text
               style={{
                 color: theme.colors.login.texto,
@@ -54,10 +56,19 @@ export function Login() {
             onPress={() => navigation.navigate("App", { screen: "Principal" })}
           />
         </Form>
-        <Text style={{ color: theme.colors.login.texto }}>
+        <Text
+          style={{
+            color: theme.colors.login.texto,
+            marginTop: 4,
+            marginBottom: 15,
+          }}
+        >
           Não tem uma conta?
-          <TouchableOpacity>
-            <Text style={{ color: "#1f86e0" }}>Crie Aqui.</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("CriarConta")}
+            style={{ marginTop: 8 }}
+          >
+            <Text style={{ color: "#1f86e0" }}> Crie Aqui.</Text>
           </TouchableOpacity>
         </Text>
         <Logo />

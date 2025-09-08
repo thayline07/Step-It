@@ -1,4 +1,5 @@
 import { StatusBar } from "expo-status-bar";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useFonts,
@@ -8,8 +9,10 @@ import {
 } from "@expo-google-fonts/inter";
 
 import { RoutesStack } from "./src/routes";
+import { useTheme } from "styled-components/native";
 import { ThemeProvider, useThemeContext } from "./src/theme/ThemeProvider";
 import { AppRoutesStack } from "./src/routes/app.routes";
+import { View } from "./src/screens/Inicial/styles";
 // import { Inicial } from "./src/screens/Inicial";
 
 export default function App() {
@@ -25,15 +28,28 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <SafeAreaView edges={["top", "left", "right"]} style={{ flex: 1 }}>
-        <MainApp />
-      </SafeAreaView>
+      {/* <SafeAreaView edges={["top", "left", "right"]} style={{ flex: 1 }}> */}
+      <MainApp />
+      {/* </SafeAreaView> */}
     </ThemeProvider>
   );
 }
 
 function MainApp() {
   const { themeName, toggleTheme } = useThemeContext();
+  const theme = useTheme();
 
-  return <RoutesStack />;
+  return (
+    <>
+      <StatusBar style="light" />
+      <View
+        style={{
+          backgroundColor: theme.colors.background_principal,
+          paddingTop: 30,
+        }}
+      >
+        <RoutesStack />
+      </View>
+    </>
+  );
 }

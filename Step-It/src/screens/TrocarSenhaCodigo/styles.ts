@@ -6,13 +6,16 @@ export const Container = styled.View`
   margin-top: 70px;
 `;
 
+export const Texto = styled.Text`
+  font-family: ${({ theme }) => theme.fonts.regular};
+  color: ${({ theme }) => theme.colors.login.texto};
+  font-size: 16px;
+  margin: 10px 20px 60px 20px;
+  text-align: center;
+`;
+
 export const Form = styled.View`
   display: flex;
   margin-top: 15px;
   /* margin-bottom: 30px; */
-`;
-
-export const TrocarSenha = styled.TouchableOpacity`
-  color: ${({ theme }) => theme.colors.login.senha};
-  margin-bottom: 60px;
 `;

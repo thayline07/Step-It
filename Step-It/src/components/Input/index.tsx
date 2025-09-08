@@ -5,16 +5,17 @@ import {
   PhoneIcon,
   UserIcon,
   LockIcon,
+  KeyIcon,
 } from "phosphor-react-native";
 
-type iconType = "user" | "email" | "senha" | "telefone";
+type iconType = "user" | "email" | "senha" | "telefone" | "key";
 
 export function InputForm({
   title,
   placeholder,
   icon,
 }: {
-  title: string;
+  title?: string;
   placeholder: string;
   icon: iconType;
 }) {
@@ -32,6 +33,8 @@ export function InputForm({
         return <PhoneIcon size={24} color={theme.colors.login.icone} />;
       case "user":
         return <UserIcon size={24} color={theme.colors.login.icone} />;
+      case "key":
+        return <KeyIcon size={24} color={theme.colors.login.icone} />;
       default:
         return null;
     }
@@ -39,7 +42,7 @@ export function InputForm({
 
   return (
     <Container>
-      <Title>{title}</Title>
+      {title && <Title>{title}</Title>}
       <Gradient
         colors={[theme.colors.login.input[0], theme.colors.login.input[1]]}
       >
