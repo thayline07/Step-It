@@ -13,6 +13,9 @@ import {
   CardEconomia,
 } from "./styles";
 
+import { buscarUsuarioPorId } from "../../utils/buscarUsuario";
+import { useAuth } from "../../contexts/AuthContext";
+
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -22,11 +25,109 @@ import Svg, { Defs, RadialGradient, Stop, Circle } from "react-native-svg";
 import { LightningIcon } from "phosphor-react-native";
 import { useThemeContext } from "../../theme/ThemeProvider";
 
+import { geracaoDiaria } from "../../utils/geracao";
+import { listarPisos } from "../../utils/piso";
+
 export function Principal() {
   const theme = useTheme();
   const currentTheme = useThemeContext();
   console.log(currentTheme);
   const [time, setTime] = useState(getCurrentTimeAMPM());
+  const { user } = useAuth();
+  const [usuarioDados, setUsuarioDados] = useState<any>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
+
+  const [geracaoTotal, setGeracaoTotal] = useState(0);
+  const [loadingGeracao, setLoadingGeracao] = useState(true);
+  const [economiaTotal, setEconomiaTotal] = useState(0);
+
+  const pisosTotais = async () => {
+    try {
+      const userId = user?.uid;
+      if (!userId) {
+        console.log("❌ Usuário não logado");
+        return [];
+      }
+
+      const result = await listarPisos(userId);
+
+      if (result.success && result.data) {
+        // ✅ Processar array de strings "nome, id" para extrair IDs
+        const idsDosPisos = result.data.map((piso) => {
+          const id = piso.split(", ")[1]; // Extrair apenas o ID
+          return id;
+        });
+        return idsDosPisos;
+      } else {
+        console.log("⚠️ Nenhum piso encontrado ou erro:", result.error);
+        return [];
+      }
+    } catch (error) {
+      console.error("❌ Erro ao buscar pisos:", error);
+      return [];
+    }
+  };
+
+  const calcularGeracaoTotal = async () => {
+    try {
+      setLoadingGeracao(true);
+
+      // 1. Buscar todos os pisos do usuário
+      const pisos = await pisosTotais();
+
+      if (pisos.length === 0) {
+        console.log("📭 Usuário não possui pisos");
+        setGeracaoTotal(0);
+        setEconomiaTotal(0);
+        return;
+      }
+
+      // 2. Buscar geração de cada piso e somar
+      let totalKw = 0;
+      let totalEconomia = 0;
+
+      for (const pisoId of pisos) {
+        const geracaoResult = await geracaoDiaria(pisoId);
+
+        if (geracaoResult.success && geracaoResult.data) {
+          // Somar a geração de todos os registros deste piso
+          geracaoResult.data.forEach((registro) => {
+            const corrente = registro.corrente || 0; // Assumindo que tem um campo corrente
+            const tensao = registro.tensao || 0; // Assumindo que tem um campo tensao
+            totalKw += (corrente * tensao) / 1000;
+
+            // Calcular economia (exemplo: R$ 0,50 por kW)
+            totalEconomia += totalKw * 0.75;
+
+            console.log(`⚡ Piso ${pisoId}: +${(corrente * tensao) / 1000} kW`);
+          });
+        } else {
+          console.log(`⚠️ Nenhuma geração encontrada para piso ${pisoId}`);
+        }
+      }
+
+      console.log(`🎯 Geração total calculada: ${totalKw} kW`);
+      console.log(
+        `💰 Economia total calculada: R$ ${totalEconomia.toFixed(2)}`
+      );
+
+      setGeracaoTotal(totalKw);
+      setEconomiaTotal(totalEconomia);
+    } catch (error) {
+      console.error("❌ Erro ao calcular geração total:", error);
+      setGeracaoTotal(0);
+      setEconomiaTotal(0);
+    } finally {
+      setLoadingGeracao(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.uid) {
+      console.log("🚀 Usuário logado, calculando geração...");
+      calcularGeracaoTotal();
+    }
+  }, [user?.uid]);
 
   function fundoEfeito() {
     if (currentTheme.themeName == "dark") {
@@ -69,6 +170,28 @@ export function Principal() {
       hour12: true,
     });
   }
+
+  // Buscar dados do usuário quando o componente montar
+  useEffect(() => {
+    async function carregarDadosUsuario() {
+      if (user?.uid) {
+        setLoadingUser(true);
+
+        const resultado = await buscarUsuarioPorId(user.uid);
+
+        if (resultado.success) {
+          setUsuarioDados(resultado.data);
+        } else {
+          console.error("❌ Erro ao buscar usuário:", resultado.error);
+          setUsuarioDados(null);
+        }
+
+        setLoadingUser(false);
+      }
+    }
+
+    carregarDadosUsuario();
+  }, [user?.uid]);
 
   useEffect(() => {
     const interval = setInterval(() => {

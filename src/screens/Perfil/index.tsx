@@ -16,10 +16,12 @@ import {
 import { FlatList, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { useState, useEffect } from "react";
 
 // Imports para autenticação
 import { deslogar } from "../../services/auth";
 import { useAuth } from "../../contexts/AuthContext";
+import { buscarUsuarioPorId } from "../../utils/buscarUsuario";
 
 type RootParamList = {
   App: { screen?: string };
@@ -33,6 +35,30 @@ type RootParamList = {
 export function Perfil() {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { user } = useAuth(); // Pegar dados do usuário logado
+  const [usuarioDados, setUsuarioDados] = useState<any>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
+
+  // Buscar dados do usuário quando o componente montar
+  useEffect(() => {
+    async function carregarDadosUsuario() {
+      if (user?.uid) {
+        setLoadingUser(true);
+
+        const resultado = await buscarUsuarioPorId(user.uid);
+
+        if (resultado.success) {
+          setUsuarioDados(resultado.data);
+        } else {
+          console.error("❌ Erro ao buscar usuário:", resultado.error);
+          setUsuarioDados(null);
+        }
+
+        setLoadingUser(false);
+      }
+    }
+
+    carregarDadosUsuario();
+  }, [user?.uid]);
 
   // Função para fazer logout
   async function handleLogout() {
@@ -110,7 +136,11 @@ export function Perfil() {
         <ContainerIcon>
           <Icon size={24} />
         </ContainerIcon>
-        <Usuario>{user?.email || "Usuário"}</Usuario>
+        <Usuario>
+          {loadingUser
+            ? "Carregando..."
+            : usuarioDados?.nome || user?.email || "Usuário"}
+        </Usuario>
         <FlatList
           data={cards}
           keyExtractor={(item) => item.id}

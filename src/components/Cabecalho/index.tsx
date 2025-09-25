@@ -10,6 +10,10 @@ import {
 } from "./styles";
 import { SunIcon, MoonIcon, ArrowLeftIcon } from "phosphor-react-native";
 import { TouchableOpacity } from "react-native";
+
+import { useEffect, useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { buscarUsuarioPorId } from "../../utils/buscarUsuario";
 // import { ThemeProvider } from "./../../theme/ThemeProvider";
 
 type tipoCabecalho = "PRINCIPAL" | "SECUNDARIO" | "TERCIARIO" | "QUATERNARIO";
@@ -24,6 +28,9 @@ export function Cabecalho({
 }) {
   const theme = useTheme();
   const currentTheme = useThemeContext();
+  const { user } = useAuth(); // Pegar dados do usuário logado
+  const [usuarioDados, setUsuarioDados] = useState<any>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
 
   const { toggleTheme } = useThemeContext();
 
@@ -38,13 +45,35 @@ export function Cabecalho({
     }
   }
 
+  // Buscar dados do usuário quando o componente montar
+  useEffect(() => {
+    async function carregarDadosUsuario() {
+      if (user?.uid) {
+        setLoadingUser(true);
+
+        const resultado = await buscarUsuarioPorId(user.uid);
+
+        if (resultado.success) {
+          setUsuarioDados(resultado.data);
+        } else {
+          console.error("❌ Erro ao buscar usuário:", resultado.error);
+          setUsuarioDados(null);
+        }
+
+        setLoadingUser(false);
+      }
+    }
+
+    carregarDadosUsuario();
+  }, [user?.uid]);
+
   switch (tipo) {
     case "PRINCIPAL":
       return (
         <Container>
           <Image source={require("./../../assets/perfil.png")} />
           <ContainerTexto>
-            <CabecalhoTitulo>Olá, Ana Lua</CabecalhoTitulo>
+            <CabecalhoTitulo>Olá, {usuarioDados?.nome}</CabecalhoTitulo>
             <CabecalhoSubtitulo>
               Quantos passos você deu hoje?
             </CabecalhoSubtitulo>

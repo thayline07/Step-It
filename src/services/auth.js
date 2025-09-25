@@ -21,18 +21,21 @@ export async function registrar(nome, email, password, telefone, pisos) {
     const emailExistente = await buscarUsuarioPorEmail(email);
     if (emailExistente.success) {
       throw new Error("auth/email-already-in-use");
+      return;
     }
 
     // 2. VERIFICAR SE JÁ EXISTE USUÁRIO COM O MESMO NOME
     const nomeExistente = await buscarUsuariosPorNome(nome);
     if (nomeExistente.success && nomeExistente.data.length > 0) {
       throw new Error("auth/username-already-in-use");
+      return;
     }
 
     // 3. VERIFICAR SE JÁ EXISTE USUÁRIO COM O MESMO TELEFONE
     const telefoneExistente = await buscarUsuarioPorTelefone(telefone);
     if (telefoneExistente.success) {
       throw new Error("auth/phone-already-in-use");
+      return;
     }
 
     // 4. SE PASSOU EM TODAS AS VALIDAÇÕES, CRIAR O USUÁRIO
@@ -139,7 +142,6 @@ export async function fetchUserData() {
     if (userDocSnap.exists()) {
       // 4. Se o documento existir, obtém os dados
       const userData = userDocSnap.data();
-      console.log("Dados do usuário:", userData);
       return userData;
     } else {
       console.log("Nenhum documento encontrado para este usuário.");

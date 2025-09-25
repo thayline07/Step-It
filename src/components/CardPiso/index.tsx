@@ -14,7 +14,7 @@ export function CardPiso({ id, nome, type, ...props }: CardProps) {
   const theme = useTheme();
 
   return (
-    <ContainerPiso {...props}>
+    <ContainerPiso>
       <View style={{ justifyContent: "center" }}>
         <NomePiso>{nome}</NomePiso>
         <IdPiso>Código: {id}</IdPiso>
@@ -22,7 +22,7 @@ export function CardPiso({ id, nome, type, ...props }: CardProps) {
       {type === "PRINCIPAL" ? (
         <></>
       ) : (
-        <TouchableOpacity>
+        <TouchableOpacity {...props}>
           <MinusIcon size={24} color={theme.colors.texto} />
         </TouchableOpacity>
       )}

@@ -7,10 +7,6 @@ export const Container = styled.View`
   align-items: center;
 `;
 
-export const Lista = styled.ScrollView`
-  margin-top: 40px;
-`;
-
 export const TitleContainer = styled.View`
   position: absolute;
   top: -50;
