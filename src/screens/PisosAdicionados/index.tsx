@@ -19,6 +19,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { ActivityIndicator, Alert, FlatList, Text } from "react-native";
 import { useCallback, useState } from "react";
 
+import { BackHandler } from "react-native";
+
 type RootParamList = {
   AdicionarPiso: undefined;
   App: { screen?: string };
@@ -126,6 +128,24 @@ export function PisosAdicionados() {
       },
     ]);
   }
+
+  // Dentro do seu componente
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        // Sua lógica personalizada aqui
+        voltar(); // ou qualquer função que você queira executar
+        return true; // Retorna true para prevenir o comportamento padrão
+      };
+
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
+
+      return () => subscription.remove();
+    }, [])
+  );
 
   useFocusEffect(
     useCallback(() => {

@@ -23,6 +23,10 @@ import { deslogar } from "../../services/auth";
 import { useAuth } from "../../contexts/AuthContext";
 import { buscarUsuarioPorId } from "../../utils/buscarUsuario";
 
+import { useFocusEffect } from "@react-navigation/native";
+import { BackHandler, ToastAndroid } from "react-native";
+import { useCallback, useRef } from "react";
+
 type RootParamList = {
   App: { screen?: string };
   TrocarSenhaCodigo: undefined;
@@ -37,6 +41,9 @@ export function Perfil() {
   const { user } = useAuth(); // Pegar dados do usuário logado
   const [usuarioDados, setUsuarioDados] = useState<any>(null);
   const [loadingUser, setLoadingUser] = useState(true);
+
+  const backPressCount = useRef(0);
+  const backPressTimer = useRef<NodeJS.Timeout | null>(null);
 
   // Buscar dados do usuário quando o componente montar
   useEffect(() => {
@@ -126,6 +133,85 @@ export function Perfil() {
       acao: handleLogout, // ← Conectar com a função de logout
     },
   ];
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        try {
+          // Verificar se está em uma das telas principais da tab bar
+          const state = navigation.getState();
+
+          if (!state || !state.routes || state.index === undefined) {
+            console.log("⚠️ Estado da navegação inválido");
+            return false;
+          }
+
+          const currentRouteName = state.routes[state.index]?.name;
+
+          console.log("🔍 Estado da navegação (Perfil):", {
+            currentRoute: currentRouteName,
+            routeIndex: state.index,
+            allRoutes: state.routes.map((r) => r.name),
+          });
+
+          // Verificar se está em uma tela principal
+          const mainTabScreens = [
+            "Principal",
+            "ListaPisosRelatorio",
+            "Perfil",
+            "PisosAdicionados",
+          ];
+          const isMainTabScreen = mainTabScreens.includes(
+            currentRouteName || ""
+          );
+        } catch (error) {
+          console.log("❌ Erro ao verificar estado da navegação:", error);
+          return false;
+        }
+
+        if (isMainTabScreen) {
+          backPressCount.current += 1;
+
+          if (backPressCount.current === 1) {
+            // Primeiro clique
+            ToastAndroid.show(
+              "Pressione novamente para sair",
+              ToastAndroid.SHORT
+            );
+
+            // Reset o contador após 2 segundos
+            backPressTimer.current = setTimeout(() => {
+              backPressCount.current = 0;
+            }, 2000);
+
+            return true; // Previne sair do app
+          } else if (backPressCount.current === 2) {
+            // Segundo clique - sair do app
+            if (backPressTimer.current) {
+              clearTimeout(backPressTimer.current);
+            }
+            BackHandler.exitApp(); // Sai do app
+            return false;
+          }
+        }
+
+        // Se não é tela principal, comportamento normal de voltar
+        return false;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
+
+      return () => {
+        subscription.remove();
+        if (backPressTimer.current) {
+          clearTimeout(backPressTimer.current);
+        }
+      };
+    }, [navigation])
+  );
 
   return (
     <Fundo>

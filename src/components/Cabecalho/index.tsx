@@ -1,3 +1,4 @@
+import React from "react";
 import { useTheme } from "styled-components/native";
 import { useThemeContext } from "../../theme/ThemeProvider";
 import {
@@ -11,7 +12,7 @@ import {
 import { SunIcon, MoonIcon, ArrowLeftIcon } from "phosphor-react-native";
 import { TouchableOpacity } from "react-native";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { buscarUsuarioPorId } from "../../utils/buscarUsuario";
 // import { ThemeProvider } from "./../../theme/ThemeProvider";
@@ -19,7 +20,8 @@ import { buscarUsuarioPorId } from "../../utils/buscarUsuario";
 type tipoCabecalho = "PRINCIPAL" | "SECUNDARIO" | "TERCIARIO" | "QUATERNARIO";
 type iconType = "CLARO" | "ESCURO";
 
-export function Cabecalho({
+// ✅ Memoizar o componente para evitar re-renders desnecessários
+const CabecalhoComponent = React.memo(function Cabecalho({
   tipo,
   funcao,
 }: {
@@ -34,7 +36,8 @@ export function Cabecalho({
 
   const { toggleTheme } = useThemeContext();
 
-  function renderIcon() {
+  // ✅ Memoizar ícone para evitar recriação
+  const renderIcon = useMemo(() => {
     switch (currentTheme.themeName) {
       case "dark":
         return <SunIcon size={24} color={theme.colors.login.icone} />;
@@ -43,29 +46,28 @@ export function Cabecalho({
       default:
         return null;
     }
-  }
+  }, [currentTheme.themeName, theme.colors.login.icone]);
 
-  // Buscar dados do usuário quando o componente montar
-  useEffect(() => {
-    async function carregarDadosUsuario() {
-      if (user?.uid) {
-        setLoadingUser(true);
+  // ✅ Memoizar busca de dados do usuário para evitar refetch desnecessário
+  const carregarDadosUsuario = useCallback(async () => {
+    if (user?.uid && !usuarioDados) {
+      setLoadingUser(true);
 
-        const resultado = await buscarUsuarioPorId(user.uid);
+      const resultado = await buscarUsuarioPorId(user.uid);
 
-        if (resultado.success) {
-          setUsuarioDados(resultado.data);
-        } else {
-          console.error("❌ Erro ao buscar usuário:", resultado.error);
-          setUsuarioDados(null);
-        }
-
-        setLoadingUser(false);
+      if (resultado.success) {
+        setUsuarioDados(resultado.data);
+      } else {
+        setUsuarioDados(null);
       }
-    }
 
+      setLoadingUser(false);
+    }
+  }, [user?.uid, usuarioDados]);
+
+  useEffect(() => {
     carregarDadosUsuario();
-  }, [user?.uid]);
+  }, [carregarDadosUsuario]);
 
   switch (tipo) {
     case "PRINCIPAL":
@@ -78,21 +80,21 @@ export function Cabecalho({
               Quantos passos você deu hoje?
             </CabecalhoSubtitulo>
           </ContainerTexto>
-          <Button onPress={toggleTheme}>{renderIcon()}</Button>
+          <Button onPress={toggleTheme}>{renderIcon}</Button>
         </Container>
       );
     case "SECUNDARIO":
       return (
         <Container>
           <Image source={require("./../../assets/perfil.png")} />
-          <Button onPress={toggleTheme}>{renderIcon()}</Button>
+          <Button onPress={toggleTheme}>{renderIcon}</Button>
         </Container>
       );
     case "TERCIARIO":
       return (
         <Container>
           <Container></Container>
-          <Button onPress={toggleTheme}>{renderIcon()}</Button>
+          <Button onPress={toggleTheme}>{renderIcon}</Button>
         </Container>
       );
     case "QUATERNARIO":
@@ -109,4 +111,6 @@ export function Cabecalho({
         </Container>
       );
   }
-}
+});
+
+export { CabecalhoComponent as Cabecalho };

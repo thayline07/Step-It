@@ -20,17 +20,92 @@ import {
   Info,
 } from "./styles";
 import { useTheme } from "styled-components/native";
+import { useEffect, useState } from "react";
+import {
+  buscarGeracaoDiaria,
+  buscarGeracaoMensal,
+  buscarGeracaoSemanal,
+} from "../../utils/geracao";
 
 export function Relatorio() {
   const route = useRoute();
-  const { id } = route.params as { id: string };
+  const { id, nome } = route.params as { id: string; nome: string };
   const theme = useTheme();
+
+  const [dadosEnergia, setDadosEnergia] = useState({
+    diaria: {
+      grafico: new Array(7).fill(0),
+      total: 0,
+    },
+    semanal: {
+      grafico: new Array(7).fill(0),
+      total: 0,
+    },
+    mensal: {
+      grafico: new Array(7).fill(0),
+      total: 0,
+    },
+  });
+  const [loading, setLoading] = useState(true);
 
   const currentTheme = useThemeContext();
   const gradientColors =
     currentTheme.themeName == "dark"
       ? ["#2FA8FF00", "#2FA8FF0f"]
       : ["#fff", "#fff"];
+
+  useEffect(() => {
+    if (!id) return;
+
+    console.log("🚀 Iniciando busca para piso:", id);
+    console.log("🚀 Nome do piso:", nome);
+
+    const unsubscribers: any = [];
+
+    // Dados diários
+    const unsubDiaria = buscarGeracaoDiaria(id, (dados) => {
+      setDadosEnergia((prev) => ({
+        ...prev,
+        diaria: {
+          grafico: dados.grafico,
+          total: dados.total,
+        },
+      }));
+      setLoading(false);
+    });
+
+    // Dados semanais
+    const unsubSemanal = buscarGeracaoSemanal(id, (dados) => {
+      setDadosEnergia((prev) => ({
+        ...prev,
+        semanal: {
+          grafico: dados.grafico,
+          total: dados.total,
+        },
+      }));
+    });
+
+    // Dados mensais
+    const unsubMensal = buscarGeracaoMensal(id, (dados) => {
+      setDadosEnergia((prev) => ({
+        ...prev,
+        mensal: {
+          grafico: dados.grafico,
+          total: dados.total,
+        },
+      }));
+    });
+
+    unsubscribers.push(unsubDiaria, unsubSemanal, unsubMensal);
+
+    return () => {
+      unsubscribers.forEach((unsub) => {
+        if (typeof unsub === "function") {
+          unsub();
+        }
+      });
+    };
+  }, [id]);
 
   return (
     <Fundo>
@@ -46,9 +121,13 @@ export function Relatorio() {
             >
               <Icon />
             </ContainerIcon>
-            <Title>Estat. Geração de Energia</Title>
+            <Title>Estat. Geração - {nome}</Title>
           </CabecalhoGrafico>
-          <Grafico />
+          <Grafico
+            dataDiaria={dadosEnergia.diaria.grafico}
+            dataSemanal={dadosEnergia.semanal.grafico}
+            dataMensal={dadosEnergia.mensal.grafico}
+          />
           <Texto>Poxa, sua geração de energia diminuiu 56% esta semana.</Texto>
         </CardGrafico>
         <CardEconomia colors={[gradientColors[0], gradientColors[1]]}>
@@ -66,11 +145,13 @@ export function Relatorio() {
           <View style={{ marginTop: 13 }}>
             <Info>
               <Texto>Geração Total</Texto>
-              <Numbers>100 kWh</Numbers>
+              <Numbers>{dadosEnergia.mensal.total.toFixed(1)} kWh</Numbers>
             </Info>
             <Info>
               <Texto>Economia</Texto>
-              <Numbers>R$ 50,00</Numbers>
+              <Numbers>
+                R$ {(dadosEnergia.mensal.total * 0.65).toFixed(2)}
+              </Numbers>
             </Info>
           </View>
         </CardEconomia>

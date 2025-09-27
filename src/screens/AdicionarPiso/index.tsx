@@ -9,7 +9,7 @@ import { Container, ContainerForm } from "./styles";
 
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { adicionarPiso, listarPisos, removerPiso } from "../../utils/piso";
+import { adicionarPiso, listarPisos } from "../../utils/piso";
 import { useState } from "react";
 import { getCurrentUser } from "../../services/auth"; // Mudança aqui
 import { useAuth } from "../../contexts/AuthContext"; // Adicionar este import
@@ -31,6 +31,36 @@ export function AdicionarPiso() {
     return navigation.goBack();
   }
 
+  // ✅ Função para debug - verificar estado dos pisos
+  async function verificarEstadoPisos() {
+    try {
+      if (!user?.uid) {
+        Alert.alert("Erro", "Usuário não está logado");
+        return;
+      }
+
+      const result = await listarPisos(user.uid);
+
+      if (result.success && result.data) {
+        const mensagem =
+          result.data.length > 0
+            ? `Pisos encontrados (${result.data.length}):\n\n${result.data.join(
+                "\n"
+              )}`
+            : "Nenhum piso encontrado na conta";
+
+        Alert.alert("Debug - Pisos Atuais", mensagem);
+      } else {
+        Alert.alert("Debug - Erro", result.error || "Erro ao listar pisos");
+      }
+    } catch (error) {
+      console.error("❌ Erro no debug:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro desconhecido";
+      Alert.alert("Debug - Erro", errorMessage);
+    }
+  }
+
   async function handleAddPiso() {
     // Validações básicas
     if (!nomePiso.trim() || !codigoPiso.trim()) {
@@ -46,9 +76,21 @@ export function AdicionarPiso() {
     setIsLoading(true);
 
     try {
-      const result = await adicionarPiso(user.uid, codigoPiso, nomePiso);
+      // ✅ Limpar e validar os dados de entrada
+      const codigoLimpo = codigoPiso.trim();
+      const nomeLimpo = nomePiso.trim();
 
-      console.log(user.uid, codigoPiso, nomePiso);
+      if (!codigoLimpo) {
+        Alert.alert("Erro", "Por favor, insira o código do piso");
+        return;
+      }
+
+      if (!nomeLimpo) {
+        Alert.alert("Erro", "Por favor, insira o nome do piso");
+        return;
+      }
+
+      const result = await adicionarPiso(user.uid, codigoLimpo, nomeLimpo);
 
       if (result.success) {
         Alert.alert("Sucesso", "Piso adicionado com sucesso!", [
@@ -64,11 +106,23 @@ export function AdicionarPiso() {
           },
         ]);
       } else {
+        // ✅ Tratamento específico de erros
+        let mensagemErro = "Erro desconhecido";
+
         console.error("❌ Erro retornado:", result.error);
-        Alert.alert("Erro", result.error || "Erro ao adicionar piso");
+
+        if (result.error === "duplicate") {
+          mensagemErro = "Este piso já foi adicionado à sua conta!";
+        } else if (result.error === "Código inválido!") {
+          mensagemErro =
+            "Código do piso não encontrado. Verifique se o código está correto.";
+        } else {
+          mensagemErro = result.error || "Erro ao adicionar piso";
+        }
+
+        Alert.alert("Erro", mensagemErro);
       }
     } catch (error) {
-      console.error("❌ Erro inesperado:", error);
       Alert.alert("Erro", "Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setIsLoading(false);
@@ -100,8 +154,9 @@ export function AdicionarPiso() {
           text={isLoading ? "Adicionando..." : "Adicionar Piso"}
           onPress={handleAddPiso}
           disabled={isLoading}
-          style={{ marginBottom: 50 }}
+          style={{ marginBottom: 20 }}
         />
+
         <Logo />
       </Container>
     </Fundo>

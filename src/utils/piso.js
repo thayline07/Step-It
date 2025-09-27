@@ -22,35 +22,61 @@ import {
  */
 export async function adicionarPiso(usuarioId, pisoId, nomePiso) {
   try {
-    // Verificar se o usuário existe
-    const userDocRef = doc(db, "usuario", usuarioId);
-    const userDoc = await getDoc(userDocRef);
-
-    if (!userDoc.exists()) {
-      return { success: false, error: "Usuário não encontrado" };
-    }
-
+    // Verificar se o piso existe no sistema
     const pisoDocRef = doc(db, "piso", pisoId);
     const pisoDoc = await getDoc(pisoDocRef);
 
-    if (!pisoDoc.exists()) {
+    if (pisoDoc.exists()) {
+      console.log("📄 Dados do piso:", pisoDoc.data());
+    } else {
+      // ✅ Vamos também tentar buscar todos os pisos para ver quais existem
+      const pisosCollection = collection(db, "piso");
+      const pisosSnapshot = await getDocs(pisosCollection);
+
+      pisosSnapshot.forEach((doc) => {});
+
       return { success: false, error: "Código inválido!" };
+    }
+
+    // ✅ Esperar um pouco para garantir que as mudanças anteriores foram sincronizadas
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    // ✅ Forçar nova consulta do usuário para evitar cache
+
+    const userDocRef = doc(db, "usuario", usuarioId);
+    const userDoc = await getDoc(userDocRef, { source: "server" });
+
+    if (!userDoc.exists()) {
+      return { success: false, error: "Usuário não encontrado" };
     }
 
     // Verificar se o piso já está na lista do usuário
     const userData = userDoc.data();
     const pisosAtuais = userData.pisos || [];
 
+    // ✅ Validação mais robusta de duplicatas
     const pisoExistente = pisosAtuais.find((piso) => {
-      const idPiso = piso.split(", ")[1];
-      return idPiso === pisoId;
+      if (typeof piso !== "string") {
+        return false;
+      }
+
+      const partes = piso.split(", ");
+      if (partes.length < 2) {
+        return false;
+      }
+
+      const idPiso = partes[partes.length - 1].trim(); // Último elemento é o ID
+      const match = idPiso === pisoId.trim();
+
+      return match;
     });
 
     if (pisoExistente) {
-      return { success: false, error: "Este piso já foi adicionado!" };
+      return { success: false, error: "duplicate" }; // Erro específico para duplicata
     }
 
     // Adicionar o piso ao array
+
     await updateDoc(userDocRef, {
       pisos: arrayUnion(`${nomePiso}, ${pisoId}`),
     });
@@ -70,18 +96,16 @@ export async function adicionarPiso(usuarioId, pisoId, nomePiso) {
 export async function removerPiso(usuarioId, pisoId, pisoInfo) {
   try {
     const userDocRef = doc(db, "usuario", usuarioId);
-    const userDoc = await getDoc(userDocRef);
+    // ✅ Forçar consulta do servidor para dados atuais
+    const userDoc = await getDoc(userDocRef, { source: "server" });
 
     if (!userDoc.exists()) {
       return { success: false, error: "Usuário não encontrado" };
     }
 
-    const pisoDocRef = doc(db, "piso", pisoId);
-
     // Verificar se o piso está na lista do usuário
     const userData = userDoc.data();
     const pisosAtuais = userData.pisos || [];
-    const nomePiso = pisoInfo.split(", ")[0];
 
     const pisoEncontrado = pisosAtuais.find((piso) => {
       const idPiso = piso.split(", ")[1];
@@ -96,10 +120,14 @@ export async function removerPiso(usuarioId, pisoId, pisoInfo) {
       };
     }
 
-    // Remover o piso do array
+    // ✅ Usar o formato EXATO que está no banco
     await updateDoc(userDocRef, {
-      pisos: arrayRemove(pisoInfo),
+      pisos: arrayRemove(pisoEncontrado), // Use o valor exato encontrado
     });
+
+    // ✅ Verificar se a remoção funcionou
+    const userDocAtualizado = await getDoc(userDocRef, { source: "server" });
+    const pisosAtualizados = userDocAtualizado.data().pisos || [];
 
     return { success: true, message: "Piso removido com sucesso" };
   } catch (error) {
@@ -115,7 +143,8 @@ export async function removerPiso(usuarioId, pisoId, pisoInfo) {
 export async function listarPisos(usuarioId) {
   try {
     const userDocRef = doc(db, "usuario", usuarioId);
-    const userDoc = await getDoc(userDocRef);
+    // ✅ Forçar consulta do servidor para dados sempre atualizados
+    const userDoc = await getDoc(userDocRef, { source: "server" });
 
     if (!userDoc.exists()) {
       return { success: false, error: "Usuário não encontrado" };
@@ -132,7 +161,6 @@ export async function listarPisos(usuarioId) {
       })
     );
 
-    console.log(`📋 Usuário ${usuarioId} tem ${pisos.length} pisos`);
     return { success: true, data: pisos };
   } catch (error) {
     console.error("❌ Erro ao listar pisos do usuário:", error);

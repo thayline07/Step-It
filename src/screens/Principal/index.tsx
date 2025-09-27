@@ -19,20 +19,49 @@ import { useAuth } from "../../contexts/AuthContext";
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useTheme } from "styled-components/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Svg, { Defs, RadialGradient, Stop, Circle } from "react-native-svg";
 import { LightningIcon } from "phosphor-react-native";
 import { useThemeContext } from "../../theme/ThemeProvider";
 
 import { geracaoDiaria } from "../../utils/geracao";
 import { listarPisos } from "../../utils/piso";
+import { db } from "../../../firebaseConfig";
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  Timestamp,
+} from "firebase/firestore";
+
+import { BackHandler, Alert, ToastAndroid } from "react-native";
+import { useRef } from "react";
+
+type RootParamList = {
+  App: { screen?: string };
+  ListaPisosRelatorio: undefined;
+  Perfil: undefined;
+};
 
 export function Principal() {
+  const navigation = useNavigation();
   const theme = useTheme();
   const currentTheme = useThemeContext();
-  console.log(currentTheme);
-  const [time, setTime] = useState(getCurrentTimeAMPM());
+
+  // ✅ Memoizar função de tempo para evitar recálculos
+  const getCurrentTimeAMPM = useCallback(() => {
+    const now = new Date();
+    return now.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  }, []);
+
+  const [time, setTime] = useState(() => getCurrentTimeAMPM());
   const { user } = useAuth();
   const [usuarioDados, setUsuarioDados] = useState<any>(null);
   const [loadingUser, setLoadingUser] = useState(true);
@@ -40,12 +69,19 @@ export function Principal() {
   const [geracaoTotal, setGeracaoTotal] = useState(0);
   const [loadingGeracao, setLoadingGeracao] = useState(true);
   const [economiaTotal, setEconomiaTotal] = useState(0);
+  const [meusPisos, setMeusPisos] = useState<string[]>([]);
+  const [listenersAtivos, setListenersAtivos] = useState<(() => void)[]>([]);
+  const [dadosPorPiso, setDadosPorPiso] = useState<Map<string, number>>(
+    new Map()
+  );
+
+  const backPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const backPressCount = useRef(0);
 
   const pisosTotais = async () => {
     try {
       const userId = user?.uid;
       if (!userId) {
-        console.log("❌ Usuário não logado");
         return [];
       }
 
@@ -54,18 +90,33 @@ export function Principal() {
       if (result.success && result.data) {
         // ✅ Processar array de strings "nome, id" para extrair IDs
         const idsDosPisos = result.data.map((piso) => {
-          const id = piso.split(", ")[1]; // Extrair apenas o ID
+          const partes = piso.split(", ");
+          const id = partes[1]; // Extrair apenas o ID
+
           return id;
         });
+
         return idsDosPisos;
       } else {
-        console.log("⚠️ Nenhum piso encontrado ou erro:", result.error);
         return [];
       }
     } catch (error) {
-      console.error("❌ Erro ao buscar pisos:", error);
       return [];
     }
+  };
+
+  // Função para recalcular total baseado nos dados por piso
+  const atualizarTotalGeral = () => {
+    let total = 0;
+    dadosPorPiso.forEach((valor) => {
+      total += valor;
+    });
+
+    const economia = total * 0.75;
+
+    setGeracaoTotal(total);
+    setEconomiaTotal(economia);
+    setLoadingGeracao(false);
   };
 
   const calcularGeracaoTotal = async () => {
@@ -76,45 +127,38 @@ export function Principal() {
       const pisos = await pisosTotais();
 
       if (pisos.length === 0) {
-        console.log("📭 Usuário não possui pisos");
         setGeracaoTotal(0);
         setEconomiaTotal(0);
         return;
       }
 
       // 2. Buscar geração de cada piso e somar
-      let totalKw = 0;
+      let totalKWh = 0;
       let totalEconomia = 0;
 
       for (const pisoId of pisos) {
         const geracaoResult = await geracaoDiaria(pisoId);
 
-        if (geracaoResult.success && geracaoResult.data) {
-          // Somar a geração de todos os registros deste piso
-          geracaoResult.data.forEach((registro) => {
-            const corrente = registro.corrente || 0; // Assumindo que tem um campo corrente
-            const tensao = registro.tensao || 0; // Assumindo que tem um campo tensao
-            totalKw += (corrente * tensao) / 1000;
+        if (
+          geracaoResult.success &&
+          geracaoResult.data &&
+          geracaoResult.data.length > 0
+        ) {
+          geracaoResult.data.forEach((registro: any) => {
+            const corrente = registro.corrente || 0;
+            const tensao = registro.tensao || 0;
 
-            // Calcular economia (exemplo: R$ 0,50 por kW)
-            totalEconomia += totalKw * 0.75;
-
-            console.log(`⚡ Piso ${pisoId}: +${(corrente * tensao) / 1000} kW`);
+            // Calcular kWh (Potência = Corrente × Tensão ÷ 1000)
+            const kWhGerado = (corrente * tensao) / 1000;
+            totalKWh += kWhGerado;
           });
-        } else {
-          console.log(`⚠️ Nenhuma geração encontrada para piso ${pisoId}`);
+          totalEconomia = totalKWh * 0.75;
+
+          setGeracaoTotal(totalKWh);
+          setEconomiaTotal(totalEconomia);
         }
       }
-
-      console.log(`🎯 Geração total calculada: ${totalKw} kW`);
-      console.log(
-        `💰 Economia total calculada: R$ ${totalEconomia.toFixed(2)}`
-      );
-
-      setGeracaoTotal(totalKw);
-      setEconomiaTotal(totalEconomia);
     } catch (error) {
-      console.error("❌ Erro ao calcular geração total:", error);
       setGeracaoTotal(0);
       setEconomiaTotal(0);
     } finally {
@@ -122,15 +166,121 @@ export function Principal() {
     }
   };
 
-  useEffect(() => {
-    if (user?.uid) {
-      console.log("🚀 Usuário logado, calculando geração...");
-      calcularGeracaoTotal();
-    }
-  }, [user?.uid]);
+  // Buscar pisos do usuário sempre que a tela ganhar foco
+  useFocusEffect(
+    React.useCallback(() => {
+      const buscarPisos = async () => {
+        if (user?.uid) {
+          const pisos = await pisosTotais();
+          setMeusPisos(pisos);
+        }
+      };
 
-  function fundoEfeito() {
-    if (currentTheme.themeName == "dark") {
+      buscarPisos();
+    }, [user?.uid])
+  );
+
+  // ✅ Configurar listeners individuais para cada piso
+  useEffect(() => {
+    if (meusPisos.length === 0) {
+      setGeracaoTotal(0);
+      setEconomiaTotal(0);
+      setLoadingGeracao(false);
+      // ✅ Limpar todos os dados quando não há pisos
+      setDadosPorPiso(new Map());
+      return;
+    }
+
+    // Limpar listeners anteriores
+    listenersAtivos.forEach((unsubscribe) => unsubscribe());
+
+    // ✅ Limpar dados de pisos que não existem mais
+    setDadosPorPiso((prevDados) => {
+      const novosDados = new Map();
+      // Manter apenas dados de pisos que ainda existem
+      meusPisos.forEach((pisoId) => {
+        if (prevDados.has(pisoId)) {
+          novosDados.set(pisoId, prevDados.get(pisoId));
+        }
+      });
+
+      return novosDados;
+    });
+
+    const agora = new Date();
+    const vintEQuatroHorasAtras = new Date(
+      agora.getTime() - 24 * 60 * 60 * 1000
+    );
+    const timestampLimite = Timestamp.fromDate(vintEQuatroHorasAtras);
+
+    const geracaoRef = collection(db, "geracao");
+    const novosListeners: (() => void)[] = [];
+
+    // ✅ Criar listeners individuais para cada piso (sem índice complexo)
+    meusPisos.forEach((pisoId) => {
+      // Query simples - sem filtro de data para evitar índice
+      const qPiso = query(
+        collection(db, "geracao"),
+        where("id_piso", "==", pisoId)
+      );
+
+      const unsubscribe = onSnapshot(qPiso, (snapshot) => {
+        let totalPiso = 0;
+
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+
+          // ✅ Filtrar manualmente por data das últimas 24h
+          if (data.data_cadastro && data.data_cadastro.toDate) {
+            const dataDoc = data.data_cadastro.toDate();
+            if (dataDoc >= vintEQuatroHorasAtras) {
+              const corrente = data.corrente || 0;
+              const tensao = data.tensao || 0;
+              const kWhGerado = (corrente * tensao) / 1000;
+              totalPiso += kWhGerado;
+            }
+          }
+        });
+
+        setDadosPorPiso((prev) => {
+          const novoMap = new Map(prev);
+          novoMap.set(pisoId, totalPiso);
+          return novoMap;
+        });
+      });
+
+      novosListeners.push(unsubscribe);
+    });
+
+    // Armazenar listeners para cleanup
+    setListenersAtivos(novosListeners);
+
+    // Cleanup: remover todos os listeners
+    return () => {
+      novosListeners.forEach((unsubscribe) => unsubscribe());
+    };
+  }, [meusPisos]);
+
+  // ✅ Atualizar totais sempre que dadosPorPiso mudar
+  useEffect(() => {
+    atualizarTotalGeral();
+  }, [dadosPorPiso]);
+
+  // Atualizar filtro de 24h a cada minuto para manter precisão
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (meusPisos.length > 0) {
+        // Força re-render do useEffect anterior mudando uma dependência
+        setMeusPisos((prev) => [...prev]);
+      }
+    }, 60000); // A cada 1 minuto
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // ✅ Memoizar SVG para evitar recriação desnecessária
+  const fundoEfeito = useMemo(() => {
+    if (currentTheme.themeName === "dark") {
       return (
         <Svg height="200" width="200">
           <Defs>
@@ -157,19 +307,9 @@ export function Principal() {
           <Circle cx="100" cy="100" r="100" fill="url(#grad)" />
         </Svg>
       );
-    } else {
-      return null;
     }
-  }
-
-  function getCurrentTimeAMPM() {
-    const now = new Date();
-    return now.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-  }
+    return null;
+  }, [currentTheme.themeName, theme.colors.color_circulo]);
 
   // Buscar dados do usuário quando o componente montar
   useEffect(() => {
@@ -182,7 +322,6 @@ export function Principal() {
         if (resultado.success) {
           setUsuarioDados(resultado.data);
         } else {
-          console.error("❌ Erro ao buscar usuário:", resultado.error);
           setUsuarioDados(null);
         }
 
@@ -198,7 +337,80 @@ export function Principal() {
       setTime(getCurrentTimeAMPM());
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [getCurrentTimeAMPM]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        let isMainTabScreen = false;
+        try {
+          // Verificar se está em uma das telas principais da tab bar
+          const state = navigation.getState();
+
+          if (!state || !state.routes || state.index === undefined) {
+            return false;
+          }
+
+          const currentRouteName = state.routes[state.index]?.name;
+
+          console.log("🔍 Estado da navegação:", {
+            currentRoute: currentRouteName,
+            routeIndex: state.index,
+            allRoutes: state.routes.map((r) => r.name),
+          });
+
+          // Verificar se está em uma tela principal (ajuste os nomes conforme sua estrutura)
+          isMainTabScreen =
+            currentRouteName === "Principal" ||
+            currentRouteName === "ListaPisosRelatorio" ||
+            currentRouteName === "Perfil";
+        } catch (error) {
+          return false;
+        }
+
+        if (isMainTabScreen) {
+          backPressCount.current += 1;
+
+          if (backPressCount.current === 1) {
+            // Primeiro clique
+            ToastAndroid.show(
+              "Pressione novamente para sair",
+              ToastAndroid.SHORT
+            );
+
+            // Reset o contador após 2 segundos
+            backPressTimer.current = setTimeout(() => {
+              backPressCount.current = 0;
+            }, 2000);
+
+            return true; // Previne sair do app
+          } else if (backPressCount.current === 2) {
+            // Segundo clique - sair do app
+            if (backPressTimer.current) {
+              clearTimeout(backPressTimer.current);
+            }
+            BackHandler.exitApp(); // Sai do app
+            return false;
+          }
+        }
+
+        // Se não é tela principal, comportamento normal de voltar
+        return false;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
+
+      return () => {
+        subscription.remove();
+        if (backPressTimer.current) {
+          clearTimeout(backPressTimer.current);
+        }
+      };
+    }, [navigation])
+  ); 
 
   return (
     <Fundo>
@@ -230,7 +442,7 @@ export function Principal() {
               { backgroundColor: theme.colors.background_principal },
             ]}
           >
-            {fundoEfeito()}
+            {fundoEfeito}
             <View
               style={{
                 position: "absolute",
@@ -245,12 +457,12 @@ export function Principal() {
                 weight="fill"
               />
               <Text style={[styles.value, { color: theme.colors.numero }]}>
-                0
+                {loadingGeracao ? "..." : geracaoTotal.toFixed(2)}
               </Text>
               <Text
                 style={[styles.unit, { color: theme.colors.numero_legenda }]}
               >
-                kW
+                kWh
               </Text>
             </View>
           </View>
@@ -270,10 +482,15 @@ export function Principal() {
           }}
         >
           <CardTitle>Total de Energia Hoje</CardTitle>
-          <CardDate>{getCurrentTimeAMPM()}</CardDate>
+          <CardDate>{time}</CardDate>
         </View>
-        <CardValue>0 kW</CardValue>
-        <CardTexto>O piso gerou um total de 0 kW até agora</CardTexto>
+        <CardValue>
+          {loadingGeracao ? "..." : geracaoTotal.toFixed(2)} kWh
+        </CardValue>
+        <CardTexto>
+          O piso gerou um total de{" "}
+          {loadingGeracao ? "..." : geracaoTotal.toFixed(2)} kWh até agora
+        </CardTexto>
         <CardLinha />
         <View
           style={{
@@ -287,7 +504,10 @@ export function Principal() {
             <CardIcon size={22} color={theme.colors.titulo_card} />
           </CardIconContainer>
           <View>
-            <CardEconomia>R$0,00</CardEconomia>
+            <CardEconomia>
+              R$
+              {loadingGeracao ? "..." : economiaTotal.toFixed(2)}
+            </CardEconomia>
             <CardTexto>Economia</CardTexto>
           </View>
         </View>
