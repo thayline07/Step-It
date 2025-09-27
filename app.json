@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Step-It",
+    "name": "Step It",
     "slug": "Step-It",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,18 +13,29 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.thayline07.StepIt",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.thayline07.StepIt",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "45a7b0c2-1082-4156-acc4-0ef7897c0317"
+      }
     }
   }
 }

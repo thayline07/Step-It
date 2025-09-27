@@ -34,5 +34,6 @@ export const Image = styled.Image`
   margin-top: 7px;
   width: 40px;
   height: 40px;
+  border-radius: 20px;
   align-self: flex-start;
 `;

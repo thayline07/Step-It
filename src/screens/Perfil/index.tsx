@@ -218,7 +218,7 @@ export function Perfil() {
       <Cabecalho tipo="TERCIARIO" />
       <Container>
         <Title>Perfil</Title>
-        <Imagem source={require("./../../assets/perfil.png")} />
+        <Imagem source={require("./../../assets/perfil.jpg")} />
         <ContainerIcon>
           <Icon size={24} />
         </ContainerIcon>

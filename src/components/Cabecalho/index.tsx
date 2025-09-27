@@ -73,7 +73,7 @@ const CabecalhoComponent = React.memo(function Cabecalho({
     case "PRINCIPAL":
       return (
         <Container>
-          <Image source={require("./../../assets/perfil.png")} />
+          <Image source={require("./../../assets/perfil.jpg")} />
           <ContainerTexto>
             <CabecalhoTitulo>Olá, {usuarioDados?.nome}</CabecalhoTitulo>
             <CabecalhoSubtitulo>
@@ -86,7 +86,7 @@ const CabecalhoComponent = React.memo(function Cabecalho({
     case "SECUNDARIO":
       return (
         <Container>
-          <Image source={require("./../../assets/perfil.png")} />
+          <Image source={require("./../../assets/perfil.jpg")} />
           <Button onPress={toggleTheme}>{renderIcon}</Button>
         </Container>
       );
