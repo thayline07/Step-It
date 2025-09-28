@@ -76,6 +76,9 @@ export function Relatorio() {
 
     // Dados semanais
     const unsubSemanal = buscarGeracaoSemanal(id, (dados) => {
+      console.log("📈 [REACT] Dados semanais recebidos:", dados);
+      console.log("📈 [REACT] Grafico semanal:", dados.grafico);
+      console.log("📈 [REACT] Total semanal:", dados.total);
       setDadosEnergia((prev) => ({
         ...prev,
         semanal: {
@@ -87,6 +90,7 @@ export function Relatorio() {
 
     // Dados mensais
     const unsubMensal = buscarGeracaoMensal(id, (dados) => {
+      console.log("Dados mensais recebidos:", dados);
       setDadosEnergia((prev) => ({
         ...prev,
         mensal: {

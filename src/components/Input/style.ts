@@ -20,6 +20,7 @@ export const Gradient = styled(LinearGradient)`
 `;
 
 export const Input = styled.TextInput<TextInputProps>`
+  color: ${({ theme }) => theme.colors.texto};
   width: 346px;
   padding-left: 50px;
   height: 48px;

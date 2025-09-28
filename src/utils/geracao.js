@@ -241,49 +241,122 @@ export const buscarGeracaoDiaria = (pisoId, callback) => {
 export const buscarGeracaoSemanal = (pisoId, callback) => {
   const hoje = new Date();
 
-  // Calcular início da semana (domingo = 0, segunda = 1...)
+  // Últimos 7 dias (em vez de semana do calendário)
   const inicioSemana = new Date(hoje);
-  inicioSemana.setDate(hoje.getDate() - hoje.getDay());
+  inicioSemana.setDate(hoje.getDate() - 6); // 6 dias atrás + hoje = 7 dias
   inicioSemana.setHours(0, 0, 0, 0);
 
-  const fimSemana = new Date(inicioSemana);
-  fimSemana.setDate(inicioSemana.getDate() + 6);
+  const fimSemana = new Date(hoje);
   fimSemana.setHours(23, 59, 59, 999);
 
   // Query simplificada para evitar erro de índice
   const q = query(collection(db, "geracao"), where("id_piso", "==", pisoId));
 
   return onSnapshot(q, (snapshot) => {
+    console.log(`📈 [SEMANAL] Snapshot recebido para piso ${pisoId}:`, {
+      tamanho: snapshot.docs.length,
+      periodo: `${inicioSemana.toISOString()} até ${fimSemana.toISOString()}`,
+    });
+
     const dadosSemana = new Array(7).fill(0); // Dom=0, Seg=1, ..., Sab=6
     let totalSemanal = 0;
 
-    snapshot.docs.forEach((doc) => {
+    snapshot.docs.forEach((doc, index) => {
       const data = doc.data();
-      const dataDocumento = data.data_cadastro.toDate();
-      const diaSemana = dataDocumento.getDay();
 
+      // Verificar diferentes formatos de campo de data
+      let dataDocumento = null;
       let energia = 0;
 
-      // Calcular energia a partir de tensão e corrente
-      if (data.energia_gerada) {
-        energia = parseFloat(data.energia_gerada) || 0;
-      } else if (data.tensao && data.corrente) {
-        const tensao = parseFloat(data.tensao) || 0;
-        const corrente =
-          parseFloat(data.corrente) || parseFloat(data["corrente "]) || 0;
-        const potencia = tensao * corrente;
-        energia = (potencia * 1) / 1000; // kWh
+      // Tentar diferentes nomes de campos de data (igual à função diária)
+      if (data.data_cadastro) {
+        dataDocumento = data.data_cadastro.toDate();
+      } else if (data.timestamp) {
+        dataDocumento = data.timestamp.toDate();
+      } else if (data.created_at) {
+        dataDocumento = data.created_at.toDate();
+      } else if (data.date) {
+        dataDocumento = data.date.toDate();
       }
 
+      // Tentar diferentes nomes de campos de energia (igual à função diária)
+      if (data.energia_gerada) {
+        energia = parseFloat(data.energia_gerada) || 0;
+      } else if (data.energia) {
+        energia = parseFloat(data.energia) || 0;
+      } else if (data.energy) {
+        energia = parseFloat(data.energy) || 0;
+      } else if (data.value) {
+        energia = parseFloat(data.value) || 0;
+      } else if (data.amount) {
+        energia = parseFloat(data.amount) || 0;
+      } else if (data.tensao) {
+        // CALCULAR ENERGIA A PARTIR DE TENSÃO E CORRENTE
+        const tensao = parseFloat(data.tensao) || 0;
+        const corrente =
+          parseFloat(data.corrente) || parseFloat(data["corrente "]) || 0; // Note o espaço extra
+
+        console.log(`🔍 [SEMANAL] Valores encontrados:`, {
+          tensao: data.tensao,
+          corrente_sem_espaco: data.corrente,
+          corrente_com_espaco: data["corrente "],
+          tensao_parsed: tensao,
+          corrente_parsed: corrente,
+        });
+
+        // Verificar se os valores são válidos
+        if (tensao > 0 && corrente > 0) {
+          // Assumindo 1 hora de funcionamento por medição
+          // Potência (W) = Tensão (V) × Corrente (A)
+          // Energia (kWh) = Potência (W) × Tempo (h) ÷ 1000
+          const potencia = tensao * corrente; // Watts
+          energia = (potencia * 1) / 1000; // kWh (assumindo 1 hora)
+          console.log(
+            `⚡ [SEMANAL] Energia calculada: ${energia} kWh (${tensao}V × ${corrente}A)`
+          );
+        }
+      }
+
+      if (!dataDocumento) {
+        console.log(
+          "⚠️ [SEMANAL] Campo de data não encontrado em:",
+          Object.keys(data)
+        );
+        return;
+      }
+
+      if (energia <= 0) {
+        console.log(`⚠️ [SEMANAL] Doc ${index} - Energia zero ou inválida:`, {
+          campos: Object.keys(data),
+          tensao: data.tensao,
+          corrente: data.corrente,
+          energia_gerada: data.energia_gerada,
+          energia_calculada: energia,
+        });
+        return;
+      }
+
+      const diaSemana = dataDocumento.getDay();
+
       // Filtrar manualmente por data (esta semana)
-      if (
-        dataDocumento >= inicioSemana &&
-        dataDocumento <= fimSemana &&
-        energia > 0
-      ) {
+      if (dataDocumento >= inicioSemana && dataDocumento <= fimSemana) {
+        console.log(
+          `✅ [SEMANAL] Adicionando energia ${energia} para dia ${diaSemana}`
+        );
         dadosSemana[diaSemana] += energia;
         totalSemanal += energia;
+      } else {
+        console.log(`⏰ [SEMANAL] Data fora do período:`, {
+          dataDoc: dataDocumento.toISOString(),
+          inicioSemana: inicioSemana.toISOString(),
+          fimSemana: fimSemana.toISOString(),
+        });
       }
+    });
+
+    console.log(`📊 [SEMANAL] Resultado final:`, {
+      dadosSemana,
+      totalSemanal,
     });
 
     callback({
@@ -297,60 +370,57 @@ export const buscarGeracaoSemanal = (pisoId, callback) => {
 export const buscarGeracaoMensal = (pisoId, callback) => {
   const hoje = new Date();
 
-  // Primeiro dia do mês
-  const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1, 0, 0, 0);
+  // Últimos 30 dias (em vez do mês do calendário)
+  const inicioMes = new Date(hoje);
+  inicioMes.setDate(hoje.getDate() - 29); // 29 dias atrás + hoje = 30 dias
+  inicioMes.setHours(0, 0, 0, 0);
 
-  // Último dia do mês
-  const fimMes = new Date(
-    hoje.getFullYear(),
-    hoje.getMonth() + 1,
-    0,
-    23,
-    59,
-    59
-  );
+  const fimMes = new Date(hoje);
+  fimMes.setHours(23, 59, 59, 999);
 
   // Query simplificada para evitar erro de índice
   const q = query(collection(db, "geracao"), where("id_piso", "==", pisoId));
 
   return onSnapshot(q, (snapshot) => {
-    const hoje = new Date();
-    const diasNoMes = new Date(
-      hoje.getFullYear(),
-      hoje.getMonth() + 1,
-      0
-    ).getDate();
-    const dadosCompletos = new Array(diasNoMes).fill(0);
+    const dadosCompletos = new Array(30).fill(0); // Últimos 30 dias
     let totalMensal = 0;
 
     snapshot.docs.forEach((doc) => {
       const data = doc.data();
       const dataDocumento = data.data_cadastro.toDate();
-      const diaDoMes = dataDocumento.getDate() - 1; // 0-indexed
 
       let energia = 0;
 
       // Calcular energia a partir de tensão e corrente
       if (data.energia_gerada) {
         energia = parseFloat(data.energia_gerada) || 0;
-      } else if (data.tensao && data.corrente) {
+      } else if (data.tensao) {
         const tensao = parseFloat(data.tensao) || 0;
         const corrente =
           parseFloat(data.corrente) || parseFloat(data["corrente "]) || 0;
-        const potencia = tensao * corrente;
-        energia = (potencia * 1) / 1000; // kWh
+
+        if (tensao > 0 && corrente > 0) {
+          const potencia = tensao * corrente;
+          energia = (potencia * 1) / 1000; // kWh
+        }
       }
 
-      // Filtrar manualmente por data (este mês) e validar índice do array
+      // Filtrar manualmente por data (últimos 30 dias)
       if (
         dataDocumento >= inicioMes &&
         dataDocumento <= fimMes &&
-        diaDoMes >= 0 &&
-        diaDoMes < diasNoMes &&
         energia > 0
       ) {
-        dadosCompletos[diaDoMes] += energia;
-        totalMensal += energia;
+        // Calcular quantos dias atrás foi este documento
+        const diasAtras = Math.floor(
+          (hoje - dataDocumento) / (1000 * 60 * 60 * 24)
+        );
+        const indice = 29 - diasAtras; // Inverter para que hoje seja índice 29
+
+        if (indice >= 0 && indice < 30) {
+          dadosCompletos[indice] += energia;
+          totalMensal += energia;
+        }
       }
     });
 
