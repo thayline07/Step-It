@@ -31,6 +31,7 @@ export function Relatorio() {
   const route = useRoute();
   const { id, nome } = route.params as { id: string; nome: string };
   const theme = useTheme();
+  const [graficoPeriod, setGraficoPeriod] = useState("Hoje");
 
   const [dadosEnergia, setDadosEnergia] = useState({
     diaria: {
@@ -76,9 +77,6 @@ export function Relatorio() {
 
     // Dados semanais
     const unsubSemanal = buscarGeracaoSemanal(id, (dados) => {
-      console.log("📈 [REACT] Dados semanais recebidos:", dados);
-      console.log("📈 [REACT] Grafico semanal:", dados.grafico);
-      console.log("📈 [REACT] Total semanal:", dados.total);
       setDadosEnergia((prev) => ({
         ...prev,
         semanal: {
@@ -90,7 +88,6 @@ export function Relatorio() {
 
     // Dados mensais
     const unsubMensal = buscarGeracaoMensal(id, (dados) => {
-      console.log("Dados mensais recebidos:", dados);
       setDadosEnergia((prev) => ({
         ...prev,
         mensal: {
@@ -131,8 +128,9 @@ export function Relatorio() {
             dataDiaria={dadosEnergia.diaria.grafico}
             dataSemanal={dadosEnergia.semanal.grafico}
             dataMensal={dadosEnergia.mensal.grafico}
+            value={graficoPeriod}
+            setValue={setGraficoPeriod}
           />
-          <Texto>Poxa, sua geração de energia diminuiu 56% esta semana.</Texto>
         </CardGrafico>
         <CardEconomia colors={[gradientColors[0], gradientColors[1]]}>
           <CabecalhoGrafico>
@@ -149,12 +147,24 @@ export function Relatorio() {
           <View style={{ marginTop: 13 }}>
             <Info>
               <Texto>Geração Total</Texto>
-              <Numbers>{dadosEnergia.mensal.total.toFixed(1)} kWh</Numbers>
+              <Numbers>
+                {graficoPeriod === "Hoje"
+                  ? (dadosEnergia.diaria.total * 0.65).toFixed(1)
+                  : graficoPeriod === "Semana"
+                  ? (dadosEnergia.semanal.total * 0.65).toFixed(1)
+                  : (dadosEnergia.mensal.total * 0.65).toFixed(1)}
+                kWh
+              </Numbers>
             </Info>
             <Info>
               <Texto>Economia</Texto>
               <Numbers>
-                R$ {(dadosEnergia.mensal.total * 0.65).toFixed(2)}
+                R${" "}
+                {graficoPeriod === "Hoje"
+                  ? (dadosEnergia.diaria.total * 0.65).toFixed(2)
+                  : graficoPeriod === "Semana"
+                  ? (dadosEnergia.semanal.total * 0.65).toFixed(2)
+                  : (dadosEnergia.mensal.total * 0.65).toFixed(2)}
               </Numbers>
             </Info>
           </View>

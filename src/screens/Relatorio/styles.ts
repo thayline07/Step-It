@@ -68,7 +68,7 @@ export const CardEconomia = styled(LinearGradient).attrs({
   start: { x: 1, y: 1 },
   end: { x: 1, y: 0 },
 })`
-  margin-top: 20px;
+  margin-top: 15px;
   width: 370px;
   height: 250px;
   border-radius: 30px;
