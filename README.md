@@ -74,19 +74,19 @@ Ao pisar no piso:
 ## 🏗️ Arquitetura do sistema
 
 
-Usuário pisa no piso
-↓
-Sistema mecânico gera energia
-↓
-Sensores medem os dados
-↓
-ESP32 envia via HTTP
-↓
-Firebase (backend)
-↓
-Aplicativo React Native
-↓
-Dashboard e gráficos
+- Usuário pisa no piso
+- **↓**
+- Sistema mecânico gera energia
+- **↓**
+- Sensores medem os dados
+- **↓**
+- ESP32 envia via HTTP
+- **↓**
+- Firebase (backend)
+- **↓**
+- Aplicativo React Native
+- **↓**
+- Dashboard e gráficos
 
 
 ---
@@ -112,7 +112,7 @@ O Step It foi criado para atuar em locais com grande circulação de pessoas, co
 
 ## 💡 Diferenciais
 
-- Integração entre **hardware + software + app**  
+- Integração entre **hardware + app**  
 - Monitoramento em tempo real  
 - Uso de **materiais reaproveitados**  
 - Independente de condições climáticas (diferente de energia solar)  
@@ -120,17 +120,9 @@ O Step It foi criado para atuar em locais com grande circulação de pessoas, co
 
 ---
 
-## 📱 Demonstração
-
-📹 Vídeo do projeto:  
-https://youtu.be/xJgAGiJLe8U  
-
----
-
 ## 📌 Status do projeto
 
-🚧 Protótipo funcional desenvolvido  
-🚀 Possível expansão para produto comercial  
+🚧 Protótipo funcional desenvolvido   
 
 ---
 
@@ -139,7 +131,7 @@ https://youtu.be/xJgAGiJLe8U
 Projeto desenvolvido por equipe técnica no IFRS, com participação de:
 
 **Thayline Inês Simioni**  
-Desenvolvimento do aplicativo e integração de dados  
+Desenvolvimento do aplicativo e integração de dados
 
 ---
 
