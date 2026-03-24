@@ -20,7 +20,7 @@ https://expo.dev/accounts/thayline07/projects/Step-It/builds/8a9e09af-20e1-455f-
 
 ## Interface do aplicativo
 
-![App Preview](./assets/app-mockup.png)
+![App Preview](./mockup.png)
 
 O aplicativo foi desenvolvido com foco em:
 
