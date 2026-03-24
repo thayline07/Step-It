@@ -1,140 +1,201 @@
 # ⚡ Step It
+### Transformando passos em energia — e dados
 
-> Transformando passos em energia — e dados.
+Sistema completo de geração e monitoramento de energia a partir do movimento humano.
 
-## 🧠 Sobre o projeto
-
-O **Step It** é um sistema completo de geração e monitoramento de energia a partir do movimento humano.  
-A proposta é simples e inovadora: **cada passo dado sobre o piso gera energia elétrica**, que pode ser monitorada em tempo real por meio de um aplicativo.
-
-O projeto foi desenvolvido como parte de uma apresentação estilo *Shark Tank*, com foco em **sustentabilidade, inovação tecnológica e impacto urbano**.
+O **Step It** integra hardware e software para transformar passos em energia elétrica e permitir o acompanhamento da geração em tempo real por meio de um aplicativo mobile.
 
 ---
 
-## 🚀 Funcionalidades
+# 📱 Visualização do aplicativo
 
-- 🔐 Autenticação de usuários  
-- ⚡ Monitoramento de geração de energia em tempo real  
-- 📊 Visualização de dados (diário, semanal, mensal)  
-- ➕ Cadastro de múltiplos pisos/dispositivos  
-- 📈 Gráficos de geração e economia  
-- 🌱 Estimativa de impacto ambiental  
+## Baixar o aplicativo (APK)
 
----
+📥 Teste o aplicativo diretamente no seu celular(somente para android):
 
-## ⚙️ Tecnologias utilizadas
-
-### 📱 Mobile
-- React Native  
-
-### 🔥 Backend / Infraestrutura
-  - Firebase  
-  - Authentication  
-  - Firestore (banco de dados)  
-  - Storage  
-
-### 🌐 Integração com hardware
-- ESP32  
-- Sensores de corrente e tensão  
-- Envio de dados via requisição HTTP  
+👉 **Download do APK**  
+https://expo.dev/accounts/thayline07/projects/Step-It/builds/8a9e09af-20e1-455f-8d15-7fdc22eed95b
 
 ---
 
-## 🔧 Como funciona
+## Interface do aplicativo
 
-O sistema é composto por três partes principais:
+![App Preview](./assets/app-mockup.png)
 
-### 1️⃣ Piso gerador de energia
+O aplicativo foi desenvolvido com foco em:
 
-Ao pisar no piso:
-
-- Uma **barra dentada** é acionada  
-- Isso movimenta um conjunto de **engrenagens**  
-- As engrenagens acionam um **motor elétrico**, que funciona como gerador  
-- A energia gerada é convertida e medida  
-
----
-
-### 2️⃣ Captura e envio de dados
-
-- Sensores medem **corrente e tensão**  
-- Um **ESP32** coleta esses dados  
-- Os dados são enviados para o backend via internet  
+- visual moderno
+- leitura rápida de dados
+- experiência intuitiva
+- modo claro e modo escuro
+- acompanhamento em tempo real da geração de energia
 
 ---
 
-### 3️⃣ Aplicativo
+# 💡 Sobre o projeto
 
-- O app recebe os dados do Firebase  
-- Exibe em forma de gráficos e relatórios  
-- Permite acompanhar geração em tempo real  
+O **Step It** foi desenvolvido como um projeto de inovação tecnológica inspirado em soluções sustentáveis para cidades inteligentes.
 
----
+A ideia é simples:
 
-## 🏗️ Arquitetura do sistema
+Pessoas caminham sobre pisos especiais instalados em locais com grande circulação e cada passo gera energia elétrica que pode ser monitorada em um aplicativo.
 
+Locais ideais para uso:
 
-- Usuário pisa no piso
-- **↓**
-- Sistema mecânico gera energia
-- **↓**
-- Sensores medem os dados
-- **↓**
-- ESP32 envia via HTTP
-- **↓**
-- Firebase (backend)
-- **↓**
-- Aplicativo React Native
-- **↓**
-- Dashboard e gráficos
-
+- escolas
+- universidades
+- estações de transporte
+- empresas
+- hospitais
+- espaços públicos
 
 ---
 
-## 🌱 Impacto e proposta
+# ⚙️ Como funciona o piso gerador
 
-O Step It foi criado para atuar em locais com grande circulação de pessoas, como:
+O sistema físico utiliza um mecanismo mecânico que converte o movimento do passo em energia elétrica.
 
-- escolas  
-- estações de transporte  
-- hospitais  
-- empresas  
-- espaços públicos  
+Funcionamento:
 
-### Benefícios:
+1. Quando uma pessoa pisa no piso, uma estrutura mecânica se movimenta.
+2. Esse movimento ativa uma **barra dentada**.
+3. A barra dentada gira um conjunto de **engrenagens**.
+4. As engrenagens acionam um **motor elétrico** que funciona como gerador.
+5. A energia gerada é convertida e medida por sensores.
+6. Os dados são enviados para o sistema.
 
-- ⚡ Geração de energia limpa  
-- 💰 Redução de custos energéticos  
-- 📊 Coleta de dados de fluxo de pessoas  
-- 🌍 Incentivo à sustentabilidade  
+Esse processo ocorre rapidamente e pode ser repetido milhares de vezes por dia em locais com alto fluxo de pessoas.
 
 ---
 
-## 💡 Diferenciais
+# 🔌 Coleta de dados do sistema
 
-- Integração entre **hardware + app**  
-- Monitoramento em tempo real  
-- Uso de **materiais reaproveitados**  
-- Independente de condições climáticas (diferente de energia solar)  
-- Aplicação em ambientes internos e externos  
+Para monitorar a energia gerada, o sistema utiliza:
 
----
+ESP32  
+Sensores de corrente  
+Sensores de tensão  
 
-## 📌 Status do projeto
+O ESP32 coleta os dados e envia para o backend.
 
-🚧 Protótipo funcional desenvolvido   
+Fluxo de dados:
 
----
-
-## 👩‍💻 Autoria
-
-Projeto desenvolvido por equipe técnica no IFRS, com participação de:
-
-**Thayline Inês Simioni**  
-Desenvolvimento do aplicativo e integração de dados
+Piso → Sensores → ESP32 → Firebase → Aplicativo
 
 ---
 
-## 📫 Contato
+# 📊 O que o aplicativo mostra
 
-📧 thaylinesimioni@gmail.com
+O aplicativo permite que o usuário acompanhe:
+
+Energia gerada no dia  
+Histórico de geração  
+Gráficos de desempenho  
+Economia estimada  
+Dispositivos cadastrados  
+
+Funcionalidades principais:
+
+- criação de conta
+- login seguro
+- cadastro de pisos
+- monitoramento em tempo real
+- visualização de gráficos
+- estimativa de economia energética
+
+---
+
+# 🚀 Instalação do projeto
+
+## Pré-requisitos
+
+Node.js  
+npm ou yarn  
+Expo CLI  
+
+---
+
+## Clonar repositório
+
+git clone https://github.com/thayline07/step-it.git
+
+cd step-it
+
+
+---
+
+## Instalar dependências
+
+npm install
+
+
+---
+
+## Rodar o projeto
+
+npx expo start
+
+
+
+---
+
+# 📡 Exemplo de dados recebidos do hardware
+{
+energia: 14.4,
+timestamp: "2024-01-01T10:00:00Z"
+}
+
+
+Esses dados são enviados pelo ESP32 e armazenados no Firebase.
+
+---
+
+# 🧪 Testes
+
+Planejado para futuras versões:
+
+Jest  
+React Native Testing Library
+
+---
+
+# 🛣 Roadmap
+
+Melhorias planejadas:
+
+Dashboard web  
+Notificações em tempo real  
+Análise avançada de dados  
+Sistema de ranking de geração de energia  
+Melhorias de UX/UI  
+Integração com mais sensores
+
+---
+
+# 🌱 Impacto do projeto
+
+O objetivo do Step It é incentivar soluções sustentáveis e inteligentes para cidades modernas.
+
+Benefícios:
+
+energia limpa  
+uso de energia gerada pelo movimento humano  
+monitoramento inteligente  
+conscientização ambiental
+
+---
+
+# 👩‍💻 Autora
+
+Thayline Inês Simioni
+
+Estudante de Matemática Aplicada e Computacional — UFRGS  
+Desenvolvedora Front-end
+
+Email: thaylinesimioni@gmail.com
+
+---
+
+# 📄 Licença
+
+MIT
