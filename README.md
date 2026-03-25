@@ -215,7 +215,7 @@ O objetivo do Step It é incentivar soluções sustentáveis e inteligentes para
 
 ---
 
-#👩‍💻 Autores
+# 👩‍💻 Autores
 
 ## Thayline Inês Simioni
 Planejamento e desenvolvimento do aplicativo
