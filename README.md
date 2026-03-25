@@ -202,7 +202,7 @@ Esses dados são enviados pelo ESP32 e armazenados no Firebase.
 
 ---
 
-#🌱 Impacto do projeto
+# 🌱 Impacto do projeto
 
 O objetivo do Step It é incentivar soluções sustentáveis e inteligentes para cidades modernas.
 
