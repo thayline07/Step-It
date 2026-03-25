@@ -7,6 +7,14 @@ O **Step It** integra hardware e software para transformar passos em energia el�
 
 ---
 
+## Contexto do Projeto
+
+Este projeto foi desenvolvido em 2025 como parte do evento anual *Shark Tank* do Instituto Federal do Rio Grande do Sul (IFRS) – Campus Sertão, realizado no terceiro ano do curso técnico em Manutenção e Suporte em Informática.
+O desafio consistia em identificar um problema real e propor uma solução inovadora. Nesta edição, o tema foi sustentabilidade.
+O projeto **Step It** foi o vencedor da competição, conquistando o primeiro lugar.
+
+---
+
 # 📱 Visualização do aplicativo
 
 ## 📥 Baixar o aplicativo (APK)
