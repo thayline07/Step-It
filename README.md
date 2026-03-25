@@ -160,28 +160,35 @@ Piso → Sensores → ESP32 → Firebase → App React Native
 ```bash
 git clone https://github.com/thayline07/step-it.git
 cd step-it
+```
 
 ---
 
 ## Instalar Dependências
 
+```bash
 npm install
-
+```
 ---
 
 ## Rodar Projeto
 
+```bash
 npx expo start
+```
 
 ---
 
 # 📡 Exemplo de dados recebidos do hardware
+
+```bash
 {
   "tensao": 120,
   "corrente": 10,
   "id_piso": "***************",
   "timestamp": "2026-01-01T10:00:00Z"
 }
+```
 
 Esses dados são enviados pelo ESP32 e armazenados no Firebase.
 
