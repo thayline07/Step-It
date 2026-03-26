@@ -218,10 +218,11 @@ O objetivo do Step It é incentivar soluções sustentáveis e inteligentes para
 # 👩‍💻 Autores
 
 ## Thayline Inês Simioni
-Planejamento e desenvolvimento do aplicativo
-📧 thaylinesimioni@gmail.com
+- Graduanda em Matemática Aplicada e Computacional pela UFRGS
+- Planejamento e desenvolvimento do aplicativo
+- 📧 thaylinesimioni@gmail.com
 
 ## Enzo Gabriel Pagotto Tedesco
-Graduando em Engenharia Aeroespacial pela UFSM
-Planejamento do aplicativo e planejamento e desenvolvimento do sistema físico
-📧 tedescoenzo5595@gmail.com
+- Graduando em Engenharia Aeroespacial pela UFSM
+- Planejamento do aplicativo e planejamento e desenvolvimento do sistema físico
+- 📧 tedescoenzo5595@gmail.com
