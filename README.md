@@ -222,5 +222,6 @@ Planejamento e desenvolvimento do aplicativo
 📧 thaylinesimioni@gmail.com
 
 ## Enzo Gabriel Pagotto Tedesco
+Graduando em Engenharia Aeroespacial pela UFSM
 Planejamento do aplicativo e planejamento e desenvolvimento do sistema físico
-📧
+📧 tedescoenzo5595@gmail.com
